@@ -16,7 +16,7 @@ Use the sparse GPS data collected from NFTA buses to impute the traffic conditio
     - [ ] Pick up the stations and get their info
     - [ ] Download data
     - [ ] Transfer data to required format
-  - [ ] NFTA
+  - [ ] NFTA (Refer to this [repository](https://github.com/wdzhong/NFTA-process-data) for details)
     - [ ] Pick up the road segments and find a way to save them
     - [ ] Map raw GPS data to corresponding road segments and get the traffic condition from GPS
     - [ ] Transfer data to required format
