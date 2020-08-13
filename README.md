@@ -12,8 +12,9 @@ Use the sparse GPS data collected from NFTA buses to impute the traffic conditio
 
 ## Plans
 - [ ] Data process
-  - [ ] PeMS, used for validation; refer to `References 2` for more details
+  - [ ] PeMS, used for validation; refer to `References 2` (which uses the same data as [DCRNN](https://github.com/liyaguang/DCRNN)) for more details
     - [ ] Pick up the stations and get their info
+      - We can use the selected sensors from DCRNN directly.
     - [ ] Download data
     - [ ] Transfer data to required format
   - [ ] NFTA (Refer to this [repository](https://github.com/wdzhong/NFTA-process-data) for details)
