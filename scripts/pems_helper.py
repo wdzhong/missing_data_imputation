@@ -1,4 +1,5 @@
 from copy import deepcopy
+import os
 
 import numpy as np
 import pandas as pd
@@ -129,3 +130,31 @@ def calculate_sensor_distance(meta_file, save=False, output_file=None):
         pd.DataFrame(dist, columns=['from', 'to', 'dist']).to_csv(output_file, index=False)
 
     return dist
+
+
+def load_adj_matrix_etc(filename: str):
+    """
+    Load (filtered) sensors, including sensor IDs, map from sensor
+    ID to index, and normalized adjacency matrix of these sensors,
+
+    Parameters
+    -----------
+    filename: str
+        The path of the npz file.
+
+    Returns
+    --------
+    sensor IDs: list
+    sensor ID to index: dictionary, {sensor ID: index}
+    normalized adjacency matrix: 2D numpy array, shape (num_of_sensors, num_of_sensors)
+    """
+    if not os.path.isfile(filename):
+        print(f"Adjacency matrix file {filename} does NOT exist.")
+        exit(0)
+
+    data = np.load(filename, allow_pickle=True)
+    sensor_ids = data['sensor_ids']
+    # https://stackoverflow.com/questions/22315595/saving-dictionary-of-header-information-using-numpy-savez
+    sensor_id_to_idx = data['sensor_id_to_idx'][()]
+    adj_matrix = data['adj_matrix']
+    return sensor_ids, sensor_id_to_idx, adj_matrix
