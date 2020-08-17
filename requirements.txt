@@ -1,0 +1,4 @@
+geopy
+pandas
+numpy
+tqdm
