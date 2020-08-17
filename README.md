@@ -36,6 +36,8 @@ Use the sparse GPS data collected from NFTA buses to impute the traffic conditio
 
 ### PEMS
 
+Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0km/AAA3T19RYjSYK1iVP6PTbyana?dl=0). Download them, unzip, and put under folder `data_raw/d[xx]/`, where `xx` is the district ID in two digits.
+
 **Run the following commands under the root directory of this repository.**
 
 1. Select sensors/stations based on some rules, and calculate the distance between each pair of sensors
