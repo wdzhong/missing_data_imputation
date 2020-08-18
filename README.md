@@ -62,6 +62,10 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
     y: (number of samples, prediction length, number of nodes, number of traffic measurements)
     ```
 
+    The names of `train`, `val`, and `test` data files are in format
+    `{mode}_{input length}_{predict length}_{missing rate}.npz`, where
+     `mode` is train, val or test, `input length` is the length of input sequence in terms of time interval, 
+     `predict length` is the length of prediction sequence, and `missing rate` is the missing rate in data samples.
 
 ## References
 1. KDD'14 Travel Time Estimation of a Path using Sparse Trajectories
