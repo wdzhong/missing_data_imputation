@@ -175,8 +175,8 @@ def generate_train_val_test(source_data_filename: str, output_dir: str,
             y=_y,
             mask_x=_mask_x,
             mask_y=_mask_y,
-            x_offsets=x_offsets.reshape(list(x_offsets.shape) + [1]),
-            y_offsets=y_offsets.reshape(list(y_offsets.shape) + [1]),
+            x_offsets=x_offsets[:, None],
+            y_offsets=y_offsets[:, None],
         )
 
 

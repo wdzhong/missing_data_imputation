@@ -60,6 +60,8 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
     ```
     x: (number of samples, input length, number of nodes, number of traffic measurements)
     y: (number of samples, prediction length, number of nodes, number of traffic measurements)
+    mask_x: has the same shape with x; mask_x[idx] == 0 means data missing at certain point.
+    mask_y: has the same shape with y.
     ```
 
     The names of `train`, `val`, and `test` data files are in format
