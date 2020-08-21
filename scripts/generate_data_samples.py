@@ -125,7 +125,7 @@ def generate_train_val_test(source_data_filename: str, output_dir: str,
     x_offsets = np.arange(-input_length + 1, 1, 1)
 
     # Predict the next one hour
-    y_offsets = np.arange(1, predict_length + 2, 1)
+    y_offsets = np.arange(1, predict_length + 1, 1)
 
     # TODO: scale??
 
