@@ -36,7 +36,30 @@ Use the sparse GPS data collected from NFTA buses to impute the traffic conditio
 
 ### PEMS
 
+---
+#### Existing Downlaoded Data
+
 Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0km/AAA3T19RYjSYK1iVP6PTbyana?dl=0). Download them, unzip, and put under folder `data_raw/d[xx]/`, where `xx` is the district ID in two digits.
+
+---
+#### Steps to download more raw data and sensor metadata from [official website](http://pems.dot.ca.gov)
+
+   1. Register if not yet (it might take some time for the new account to be approved) and sign in
+   2. Download by following these steps
+      1. Click on **Data Clearinghouse** at the bottom left of the homepage
+      2. To download **data**,
+          1. on the top of the page, in the dropdown list of
+             - `Type`: select **Station 5-Minute**
+             - `District`: select target district, e.g., **District 7**
+          2. Click **Submit** button
+          3. In the table below the **Submit** button, click on the cell in the year and Month table
+          4. Download data from the **Available Files** table
+      3. To downlaod **metadata file**, choose **Station Metadata** in the `Type` dropdown list, and then select the desired `District`.
+   3. Put data and meta file under folder `data_raw/d[xx]/`, where `xx` is the district ID in two digits.
+
+
+---
+#### Steps to process PEMS data and generate samples
 
 **Run the following commands under the root directory of this repository.**
 
@@ -66,7 +89,7 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
 
     The names of `train`, `val`, and `test` data files are in format
     `{mode}_{input length}_{predict length}_{missing rate}.npz`, where
-     `mode` is train, val or test, `input length` is the length of input sequence in terms of time interval, 
+     `mode` is train, val or test, `input length` is the length of input sequence in terms of time interval,
      `predict length` is the length of prediction sequence, and `missing rate` is the missing rate in data samples.
 
 ## References
