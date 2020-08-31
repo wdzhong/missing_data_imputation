@@ -69,14 +69,16 @@ def select_sensors(meta_file, output_file, min_num_lanes=None, station_types=Non
             # TODO: we should consider keeping sensors that only have limited number of missing values
             indices_with_nan = pems.isnull().any(axis=1)
             stations_with_nan = pems['Station'].loc[indices_with_nan == True]
+            stations_with_nan_set = set(stations_with_nan.values)
+
+            stations_wt_nan = set(pems['Station'].values).difference(stations_with_nan_set)
 
             selected_stations_IDs = data['ID'].values
             # remove these stations from the selected_stations_IDs
-            stations_with_nan_set = set(stations_with_nan.values)
-            selected_stations_IDs = set(selected_stations_IDs).difference(stations_with_nan_set)
+            selected_stations_IDs = set(selected_stations_IDs).intersection(stations_wt_nan)
 
             # keep rows from the filtered/selected stations only
-            data = data[data['Station'].isin(selected_stations_IDs)]
+            data = data[data['ID'].isin(selected_stations_IDs)]
         else:
             print(f"Warning: There is NO data file.")
 
@@ -93,8 +95,10 @@ if __name__ == "__main__":
                         help="The file that contains sensor meta information")
     parser.add_argument("--output_file", type=str, default="data_raw/d07/d07_meta_selected.csv",
                         help="The file to save the selected sensor")
+    parser.add_argument("--overwrite", type=bool, default=False,
+                        help="Redo and overwrite the existing file if it is set to True.")
     args = parser.parse_args()
-    if not os.path.isfile(args.output_file):
-        select_sensors(args.meta_file, args.output_file, min_num_lanes=3, station_types=['ML'])
+    if not os.path.isfile(args.output_file) or args.overwrite:
+        select_sensors(args.meta_file, args.output_file, min_num_lanes=3, station_types=['ML'], use_data_file=True)
 
     calculate_sensor_distance(args.output_file, save=True)
