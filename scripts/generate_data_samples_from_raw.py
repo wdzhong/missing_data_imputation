@@ -271,10 +271,8 @@ def generate_train_val_test_from_raw(district_root: str, output_dir: str,
             y=_y,
             mask_x=_mask_x,
             mask_y=_mask_y,
-            # x_offsets=x_offsets[:, None],
-            # y_offsets=y_offsets[:, None],
-            times_x=_times_x,
-            times_y=_times_y
+            times_x=_times_x[:, 0],
+            times_y=_times_y[:, 0]
         )
 
 
