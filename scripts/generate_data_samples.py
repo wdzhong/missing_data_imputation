@@ -3,6 +3,8 @@ import os
 import random
 
 import numpy as np
+from tqdm import tqdm
+import pandas as pd
 
 random.seed(0)
 
@@ -64,7 +66,7 @@ def generate_graph_seq2seq_io_data(data, mask, x_offsets, y_offsets, missing_rat
     mask_y: has the same shape with y
     """
 
-    num_times, num_nodes, num_channels = data.shape
+    num_times, _, _ = data.shape
 
     x, y = [], []
     mask_x = []
@@ -72,7 +74,10 @@ def generate_graph_seq2seq_io_data(data, mask, x_offsets, y_offsets, missing_rat
     # t is the index of the last observation.
     min_t = abs(min(x_offsets))
     max_t = abs(num_times - abs(max(y_offsets)))  # Exclusive
-    for t in range(min_t, max_t):
+    for t in tqdm(range(min_t, max_t)):
+        # TODO: check if the difference between x_offsets and y_offsets are larger than 1 day
+        #   since we removed the Weekends' data. The last few examples of the each Friday will
+        #   append with the data from next Monday instead of the following Saturday
         x_t = data[t + x_offsets, ...]  # (12, 200, 4)
         y_t = data[t + y_offsets, ...]  #
         mask_x_t = mask[t + x_offsets, ...]
@@ -127,8 +132,6 @@ def generate_train_val_test(source_data_filename: str, output_dir: str,
     # Predict the next one hour
     y_offsets = np.arange(1, predict_length + 1, 1)
 
-    # TODO: scale??
-
     # x: (num_samples, input_length, num_nodes, input_dim)
     # y: (num_samples, output_length, num_nodes, output_dim)
     x, y, mask_x, mask_y = generate_graph_seq2seq_io_data(data, mask, x_offsets, y_offsets, missing_rate)
@@ -159,6 +162,14 @@ def generate_train_val_test(source_data_filename: str, output_dir: str,
     x_test, y_test = x[-num_test:], y[-num_test:]
     mask_x_test, mask_y_test = mask_x[-num_test:], mask_y[-num_test:]
 
+    # Normalization
+    mean = np.mean(x_train, axis=0, keepdims=True)  # use np.nanmean() in case of missing
+    std = np.std(x_train, axis=0, keepdims=True)
+
+    x_train = (x_train - mean) / std
+    x_val = (x_val - mean) / std
+    x_test = (x_test - mean) / std
+
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir, exist_ok=True)
 
@@ -170,13 +181,15 @@ def generate_train_val_test(source_data_filename: str, output_dir: str,
         # train x: (387, 12, 200, 4), y: (387, 12, 200, 4)
         print(cat, "x: ", _x.shape, "y:", _y.shape)
         np.savez_compressed(
-            os.path.join(args.output_dir, cat + postfix),
+            os.path.join(output_dir, cat + postfix),
             x=_x,
             y=_y,
             mask_x=_mask_x,
             mask_y=_mask_y,
             x_offsets=x_offsets[:, None],
             y_offsets=y_offsets[:, None],
+            train_mean=mean,
+            train_std=std
         )
 
 
