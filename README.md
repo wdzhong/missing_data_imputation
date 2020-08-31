@@ -69,6 +69,8 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
 
 1. Generate the distance matrix among selected sensors, where elements smaller than threshold are set to 0.
 
+  Currently, randomly select 200 sensors.
+
     > $ python -m scripts.generate_adj_matrix
 
 1. For each district, select data based on selected sensors and merge them together

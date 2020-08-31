@@ -61,7 +61,7 @@ def get_adjacency_matrix(distance_df, sensor_ids, normalized_k=0.1):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--sensor_ids_filename', type=str,
+    parser.add_argument('--sensor_ids_filename', type=str, default="",
                         help='File containing sensor ids separated by comma.')
     parser.add_argument('--distances_filename', type=str, default='data_raw/d07/d07_meta_selected_dist_matrix.csv',
                         help='CSV file containing sensor distances with three columns: [from, to, distance].')
@@ -80,8 +80,10 @@ if __name__ == '__main__':
     if not sensor_ids:
         sensor_ids = distance_df['from'].values
 
+        sensor_ids = set(sensor_ids)
         # TODO: choose a subset first
         sensor_ids = random.sample(list(sensor_ids), 200)
+        sensor_ids = sorted(sensor_ids)
 
     normalized_k = args.normalized_k
     _, sensor_id_to_idx, adj_matrix = get_adjacency_matrix(distance_df, sensor_ids, normalized_k)
