@@ -97,6 +97,7 @@ def generate_graph_seq2seq_io_data(data, mask, x_offsets, y_offsets, missing_rat
     max_t = abs(num_times - abs(max(y_offsets)))  # Exclusive
     times_x = []
     times_y = []
+    print(f"Generate samples from a daily data file")
     for t in tqdm(range(min_t, max_t)):
         x_t = data[t + x_offsets, ...]  # (12, 200, 4)
         y_t = data[t + y_offsets, ...]  #
@@ -128,12 +129,19 @@ def generate_graph_seq2seq_io_data(data, mask, x_offsets, y_offsets, missing_rat
 
 def process_daily_file(df, num_sensors, sensor_id_to_idx):
     """
+    Process daily file to get the formatted data and mask
 
     Parameters
     ----------
-    df
-    num_sensors
-    sensor_id_to_idx
+    df: DataFrame
+        A DataFrame object that contains the content of daily data file
+
+    num_sensors: int
+        The number of sensors to collect data for. The sensor IDs in the df is
+        a subset of this sensor set.
+
+    sensor_id_to_idx: dict
+        The dictionary contains mapping relationship between sensor ID and its 0 based index
 
     Returns
     -------
@@ -188,6 +196,30 @@ def process_daily_file(df, num_sensors, sensor_id_to_idx):
 def generate_train_val_test_from_raw(district_root: str, output_dir: str,
                                      input_length: int, predict_length: int,
                                      missing_rate: int):
+    """
+    Generate train, val, and test dataset from raw data files.
+
+    Parameters
+    ----------
+    district_root: str
+        The folder that contains all raw data files.
+
+    output_dir: str
+        The folder to save the results
+
+    input_length: int
+        The (time) length of input data
+
+    predict_length: int
+        The (time) length of predict
+
+    missing_rate: int
+        The missing rate (percentage)
+
+    Returns
+    -------
+    None
+    """
     adj_matrix_file = None
     data_files = []
     for f in os.listdir(district_root):
@@ -212,6 +244,7 @@ def generate_train_val_test_from_raw(district_root: str, output_dir: str,
     all_times_y = []
 
     sensor_set = set(sensor_ids)
+    print(f"Process daily files one by one")
     for data_file in tqdm(sorted(data_files)):
         pems = load_pems_file(data_file)
         pems = pems[pems['Station'].isin(sensor_set)]

@@ -68,7 +68,6 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
     > $ python -m scripts.select_sensors
 
 1. Generate the distance matrix among selected sensors, where elements smaller than threshold are set to 0.
-
   Currently, randomly select 200 sensors.
 
     > $ python -m scripts.generate_adj_matrix
@@ -76,6 +75,14 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
 1. (Only run where needed) Generate graphs for different time intervals
 
     > $ python -m scripts.generate_more_graphs
+
+Two methods to generate samples:
+
+Method 1 (Tested and Recommended):
+1. Generate samples from raw data without preprocessing
+    > $ python -m scripts.generate_data_samples_from_raw
+
+Method 2:
 
 1. For each district, select data based on selected sensors and merge them together
 
@@ -85,18 +92,20 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
 
     > $ python -m scripts.generate_data_samples --source_data_filename=data_raw/d07/data.npz --output_dir=data/d07
 
-    The train, val, and test files will have the following format
-    ```
-    x: (number of samples, input length, number of nodes, number of traffic measurements)
-    y: (number of samples, prediction length, number of nodes, number of traffic measurements)
-    mask_x: has the same shape with x; mask_x[idx] == 0 means data missing at certain point.
-    mask_y: has the same shape with y.
-    ```
 
-    The names of `train`, `val`, and `test` data files are in format
-    `{mode}_{input length}_{predict length}_{missing rate}.npz`, where
-     `mode` is train, val or test, `input length` is the length of input sequence in terms of time interval,
-     `predict length` is the length of prediction sequence, and `missing rate` is the missing rate in data samples.
+
+The train, val, and test files will have the following format
+```
+x: (number of samples, input length, number of nodes, number of traffic measurements)
+y: (number of samples, prediction length, number of nodes, number of traffic measurements)
+mask_x: has the same shape with x; mask_x[idx] == 0 means data missing at certain point during data collection, whereas mask_x[idx] == 2 means manully added missingness.
+mask_y: has the same shape with y.
+```
+
+The names of `train`, `val`, and `test` data files are in format
+`{mode}_{input length}_{predict length}_{missing rate}.npz`, where
+ `mode` is train, val or test, `input length` is the length of input sequence in terms of time interval,
+ `predict length` is the length of prediction sequence, and `missing rate` is the missing rate in data samples.
 
 ## References
 1. KDD'14 Travel Time Estimation of a Path using Sparse Trajectories
