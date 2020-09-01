@@ -266,12 +266,28 @@ def generate_train_val_test_from_raw(district_root: str, output_dir: str,
     times_x_test, times_y_test = times_x[-num_test:], times_y[-num_test:]
 
     # Normalization
-    mean = np.mean(x_train, axis=0, keepdims=True)  # use np.nanmean() in case of missing
-    std = np.std(x_train, axis=0, keepdims=True) + 1e-6
+    mean = np.nanmean(x_train, axis=0, keepdims=True)
+    std = np.nanstd(x_train, axis=0, keepdims=True)
 
     x_train = (x_train - mean) / std
     x_val = (x_val - mean) / std
     x_test = (x_test - mean) / std
+
+    # check nan
+    names = ['x_train', 'x_val', 'x_test', 'y_train', 'y_val', 'y_test']
+    for i, v in enumerate([x_train, x_val, x_test, y_train, y_val, y_test]):
+        if np.isnan(v).any():
+            print(f"{names[i]}: {len(v[np.isnan(v)])} out of {np.prod(v.shape)} are nan (missing in data collection)")
+
+    # replace nan with 0
+    # cast to float32 to save disk spaces
+    x_train = np.nan_to_num(x_train).astype(np.float32)
+    x_val = np.nan_to_num(x_val).astype(np.float32)
+    x_test = np.nan_to_num(x_test).astype(np.float32)
+
+    y_train = np.nan_to_num(y_train).astype(np.float32)
+    y_val = np.nan_to_num(y_val).astype(np.float32)
+    y_test = np.nan_to_num(y_test).astype(np.float32)
 
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir, exist_ok=True)
@@ -290,8 +306,8 @@ def generate_train_val_test_from_raw(district_root: str, output_dir: str,
             y=_y,
             mask_x=_mask_x,
             mask_y=_mask_y,
-            times_x=_times_x[:, 0],
-            times_y=_times_y[:, 0]
+            times_x=_times_x,
+            times_y=_times_y
         )
 
 
