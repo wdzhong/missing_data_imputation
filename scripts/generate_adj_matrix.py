@@ -55,6 +55,7 @@ def get_adjacency_matrix(distance_df, sensor_ids, normalized_k=0.1):
 
     # Sets entries that lower than a threshold, i.e., k, to zero for sparsity.
     adj_matrix[adj_matrix < normalized_k] = 0
+    np.fill_diagonal(adj_matrix, 0)
 
     return sensor_ids, sensor_id_to_idx, adj_matrix
 
