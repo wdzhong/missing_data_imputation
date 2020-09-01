@@ -2,3 +2,4 @@ geopy
 pandas
 numpy
 tqdm
+scipy

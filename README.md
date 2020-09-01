@@ -73,6 +73,10 @@ Some raw PEMS data can be found [here](https://www.dropbox.com/sh/wfb3coid21in0k
 
     > $ python -m scripts.generate_adj_matrix
 
+1. (Only run where needed) Generate graphs for different time intervals
+
+    > $ python -m scripts.generate_more_graphs
+
 1. For each district, select data based on selected sensors and merge them together
 
     > $ python -m scripts.process_pems
