@@ -14,26 +14,38 @@ random.seed(0)
 
 def add_missing(mask: np.ndarray, missing_rate: int):
     """
-    Add randomly missing to mask (set to 0)
+    Add randomly missing to mask (set to 2)
 
     Parameters
     ----------
-    mask: np.ndarray
-        The original mask
+    mask: np.array
+        The original mask, where 0 means missing (during data collection) and 1 means no missing.
 
     missing_rate: int
         The missing rate (percentage) to add to the mask.
 
     Returns
     -------
-    mask with added missing: np.ndarray
-        Have the same shape with input mask.
+    mask with added missing: np.array
+        Have the same shape with input mask. Also have the same distribution of 0s with input.
+        Part of 1s of the input have been flipped to 2 to indicate manually added missing.
     """
     shape_backup = mask.shape
     mask = mask.flatten()
-    # TODO: Deal with the existing missing in the mask
-    missing_index = random.sample(range(len(mask)), int(len(mask) * missing_rate / 100))
-    mask[missing_index] = 0
+    # avoid the existing missing
+    index_wt_missing = []
+    index_w_missing = []
+    for i, m in enumerate(mask):
+        if m == 1:
+            index_wt_missing.append(i)
+        else:
+            index_w_missing.append(i)
+
+    # TODO: should the total missing rate or the added one be equal to the target missing rate?
+    nums_of_added_missing = int(len(mask) * missing_rate / 100) - len(index_w_missing)
+    assert nums_of_added_missing > 0, f"The number of missing values in the original data already larger than target"
+    missing_index = random.sample(index_wt_missing, nums_of_added_missing)
+    mask[missing_index] = 2
     return mask.reshape(shape_backup)
 
 
@@ -91,6 +103,7 @@ def generate_graph_seq2seq_io_data(data, mask, x_offsets, y_offsets, missing_rat
         mask_x_t = mask[t + x_offsets, ...]
         mask_y_t = mask[t + y_offsets, ...]
         # add randomly missing to mask
+        # 0: original missing; 1: not missing; 2: added missing
         mask_x_t = add_missing(mask_x_t, missing_rate)
         mask_y_t = add_missing(mask_y_t, missing_rate)
 
@@ -124,8 +137,8 @@ def process_daily_file(df, num_sensors, sensor_id_to_idx):
 
     Returns
     -------
-    data: (num_times, num_sensors, num_channels)
-    mask: (num_times, num_sensors, num_channels)
+    data: (num_times, num_sensors, num_channels), where nan means missing
+    mask: (num_times, num_sensors, num_channels), where 0 means data missing
     times: num_times
     """
     unit_time_interval = pd.Timedelta('5 min')
@@ -147,10 +160,11 @@ def process_daily_file(df, num_sensors, sensor_id_to_idx):
 
     num_channels = len(df.columns) - 2
 
-    data = np.zeros((num_times, num_sensors, num_channels))
+    data = np.full((num_times, num_sensors, num_channels), np.nan)
     mask = np.zeros_like(data)
 
-    print(f"Shape of DataFrame: {df.shape}")
+    # should be (num_times * num_sensors, num_channels)
+    print(f"\nShape of DataFrame: {df.shape}")
     for _, row in tqdm(df.iterrows()):
         time_slot = (row['Timestamp'] - start_time) // unit_time_interval
         sensor_idx = sensor_id_to_idx[str(row['Station'])]
@@ -160,8 +174,13 @@ def process_daily_file(df, num_sensors, sensor_id_to_idx):
         # TODO: use a better way to check possible missing value
         for i, val in enumerate(row[2:].values):
             if not val or val == 0.0:
-                mask[time_slot, sensor_idx, i] = 2
+                mask[time_slot, sensor_idx, i] = 0
                 print(f"find missing! {row}")
+
+    if mask[mask == 0].size > 0:
+        print(f"There is data missing in the daily file: ")
+        print(f"{np.prod(data.shape[: 2]) - df.shape[0]} records/rows missing in DataFrame")
+        print(f"number of missing without ground truths (mask == 0): {mask[mask == 0].size}")
 
     return data, mask, np.array(times)
 
